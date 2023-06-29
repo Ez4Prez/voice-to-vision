@@ -1,107 +1,75 @@
-import '../App.css';
-import {useState, useEffect} from 'react'
-import { Route, Switch } from "react-router-dom"
+// javascript-python-(audio_to_text)
+//     whisper api call 
+//         store text in audio_to_text model
+//     gpt api call
+//         store text in text_to_text model
+//     dahl api call
+//         store image in Text_to_image
+//     dahli api call
+//     return image to javascript
 
-import NavBar from './NavBar'
-import Header from './Header'
-import HotelList from './HotelList'
-import NewHotelForm from './NewHotelForm'
-import UpdateHotelForm from './UpdateHotelForm'
+//     send mp3 file code package in post
+//     base 64 mp3 file 
+
+//     home/hequamily/mp3
+//     /paths 
+
+//     fetch to get previous rendered mp3s
+
+import React, { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NavBar from "./ImageResults";
+import Home from "./Home";
+// import Cart from "./Cart";
+import Profile from "./Profile";
+// import Container from "./Container";
+// import Search from "./Search";
 
 function App() {
-
-  const [hotels, setHotels] = useState([])
-  const [postFormData, setPostFormData] = useState({})
-  const [idToUpdate, setIdToUpdate] = useState(0)
-  const [patchFormData, setPatchFormData] = useState({})
+  const [data, setData] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    fetch('/hotels')
-    .then(response => response.json())
-    .then(hotelData => setHotels(hotelData))
+    fetch("")
+      .then((r) => r.json())
+      .then((data) => setData(data))
   }, [])
 
-  useEffect(() => {
-    if(hotels.length > 0 && hotels[0].id){
-      setIdToUpdate(hotels[0].id)
-    }
-  }, [hotels])
-
-  function addHotel(event){
-    event.preventDefault()
-
-    fetch('/hotels', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(postFormData)
-    })
-    .then(response => response.json())
-    .then(newHotel => setHotels(hotels => [...hotels, newHotel]))
+  function addToCart(nft) {
+    setCartItems((prevItems) => [...prevItems, nft]);
   }
 
-  function updateHotel(event){
-    event.preventDefault()
-    fetch(`/hotels/${idToUpdate}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify(patchFormData)
-    })
-    .then(response => response.json())
-    .then(updatedHotel => {
-      setHotels(hotels => {
-        return hotels.map(hotel => {
-          if(hotel.id === updatedHotel.id){
-            return updatedHotel
-          }
-          else{
-            return hotel
-          }
-        })
-      })
-    })
-  }
-
-  function deleteHotel(id){
-    fetch(`/hotels/${id}`, {
-      method: "DELETE"
-    })
-    .then(() => setHotels(hotels => {
-      return hotels.filter(hotel => {
-        return hotel.id !== id
-      })
-    }))
-  }
-
-  function updatePostFormData(event){
-    setPostFormData({...postFormData, [event.target.name]: event.target.value})
-  }
-
-  function updatePatchFormData(event){
-    setPatchFormData({...patchFormData, [event.target.name]: event.target.value})
+  function removeFromCart(itemId) {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== itemId)
+    );
   }
 
   return (
-    <div className="app">
-      <NavBar/>
-      <Header />
-      <Switch>
-        <Route exact path="/">
-          <h1>Welcome! Here is the list of hotels available:</h1>
-          <HotelList hotels={hotels} deleteHotel={deleteHotel}/>
-        </Route>
-        <Route path="/add_hotel">
-          <NewHotelForm addHotel={addHotel} updatePostFormData={updatePostFormData}/>
-        </Route>
-        <Route path="/update_hotel">
-          <UpdateHotelForm updateHotel={updateHotel} setIdToUpdate={setIdToUpdate} updatePatchFormData={updatePatchFormData} hotels={hotels}/>
-        </Route>
-      </Switch>
+    <div>
+         <NavBar/>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/profile"
+            element={<Profile data={data} />}
+          />
+          {/* <Route
+            path="/nft"
+            element={<Container data={data} addToCart={addToCart} />}
+          />
+          <Route
+            path="/search"
+            element={<Search data={data} />}
+          />
+          <Route
+            path="/cart"
+            element={<Cart cartItems={cartItems} removeFromCart={removeFromCart} />}
+          /> */}
+
+        </Routes>
+
+
     </div>
   );
 }
